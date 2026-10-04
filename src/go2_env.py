@@ -25,7 +25,8 @@ class Go2Env:
     # show_viewer: Visualization to viewer enable
     # device: CPU or GPU
     # add_camera: Environment camera enable
-    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, device="cuda", add_camera = False):
+    # enable_default_keybinds: Genesis viewer keyboard shortcuts enable
+    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, device="cuda", add_camera = False, enable_default_keybinds=True):
         self.device = torch.device(device)
 
         self.num_envs = num_envs # Parallel env
@@ -56,6 +57,8 @@ class Go2Env:
                 camera_pos=(3.5, 0.5, 2.5),
                 camera_lookat=(0.0, 0.0, 0.5),
                 camera_fov=40,
+                # Teleop disables these so viewer shortcuts (W/A/S/D/R/F) do not fire alongside robot commands.
+                enable_default_keybinds=enable_default_keybinds,
             ),
             vis_options=gs.options.VisOptions(
                 rendered_envs_idx=tuple(range(num_envs)), show_world_frame=False

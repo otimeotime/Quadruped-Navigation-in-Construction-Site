@@ -104,6 +104,7 @@ def main():
         show_viewer=True,
         add_camera=True,
         device=device,
+        enable_default_keybinds=False,
     )
     
     
