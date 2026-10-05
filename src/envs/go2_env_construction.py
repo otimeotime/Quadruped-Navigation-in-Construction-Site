@@ -2,7 +2,7 @@ import math
 import numpy as np
 import genesis as gs
 from genesis.utils.geom import euler_to_R
-from go2_env_rough import Go2EnvRough
+from .go2_env_rough import Go2EnvRough
 
 # Colors (RGB in [0, 1])
 WALL_COLOR = (0.55, 0.62, 0.70)      # site hoarding

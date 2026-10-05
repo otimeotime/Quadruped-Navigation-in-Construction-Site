@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 import genesis as gs
 from genesis.ext.isaacgym import terrain_utils
-from go2_env import Go2Env
+from .go2_env import Go2Env
 
 # Height-field resolution: cell size and height step in meters
 HORIZONTAL_SCALE = 0.1

@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # src/, home of the shared packages
 import os
 import argparse
 import contextlib
@@ -6,8 +9,7 @@ import io
 import pickle
 import shutil
 import statistics
-from go2_env import Go2Env
-from go2_env_rough import Go2EnvRough
+from envs import Go2Env, Go2EnvRough
 from rsl_rl.runners import OnPolicyRunner
 from rsl_rl.utils.logger import Logger
 import genesis as gs

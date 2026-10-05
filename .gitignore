@@ -6,3 +6,5 @@
 
 *.mp4
 *.png
+# Python bytecode
+__pycache__/

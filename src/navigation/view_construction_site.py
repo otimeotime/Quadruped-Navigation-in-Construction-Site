@@ -1,9 +1,12 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # src/, home of the shared packages
 import argparse
 import cv2
 import torch
 import genesis as gs
-from go2_env_construction import Go2EnvConstruction
-from go2_train import get_cfgs
+from envs import Go2EnvConstruction
+from train.go2_train import get_cfgs
 
 
 def main():

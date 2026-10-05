@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # src/, home of the shared packages
+import wsl_cuda  # noqa: F401  (must come before genesis)
 import argparse
 import os
 import pickle
@@ -6,8 +10,8 @@ import numpy as np
 import torch
 import genesis as gs
 from rsl_rl.runners import OnPolicyRunner
-from go2_env_construction import Go2EnvConstruction
-from goal_click_plugin import GoalClickPlugin
+from envs import Go2EnvConstruction
+from navigation.goal_click_plugin import GoalClickPlugin
 from navigation import Navigator, OccupancyGrid, VelocityController
 
 # Debug drawing: height above the ground and RGBA color of each element
@@ -75,7 +79,7 @@ def main():
     navigator = Navigator(grid, controller=VelocityController(max_lin_vel_x=args.max_speed))
     clicks = env.scene.viewer.add_plugin(GoalClickPlugin())
     s = args.site_size
-    env.scene.viewer.set_camera_pose(pos=(0.9 * s, -0.9 * s, 0.75 * s), lookat=(0.0, 0.0, 0.0))
+    env.scene.viewer.set_camera_pose(pos=np.array([0.9 * s, -0.9 * s, 0.75 * s]), lookat=np.zeros(3))
     print(f"Site {s:g} x {s:g} m with {len(env.obstacles)} obstacles.")
     print("Click on the ground to send the robot there. Drag to orbit, scroll to zoom, close the window to exit.")
 

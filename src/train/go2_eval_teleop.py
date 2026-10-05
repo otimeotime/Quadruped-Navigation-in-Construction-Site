@@ -1,8 +1,11 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # src/, home of the shared packages
 import argparse
 import os
 import pickle
 import torch
-from go2_env import Go2Env
+from envs import Go2Env
 from rsl_rl.runners import OnPolicyRunner
 import numpy as np
 import genesis as gs
