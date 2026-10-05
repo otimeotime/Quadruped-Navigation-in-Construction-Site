@@ -1,0 +1,13 @@
+# torch must match the NVIDIA driver's CUDA version. With driver 570 (CUDA 12.8):
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch
+genesis-world
+pandas
+numpy
+matplotlib>=3.9
+imageio
+wandb
+moviepy
+tensorboard
+pynput
+rsl-rl-lib

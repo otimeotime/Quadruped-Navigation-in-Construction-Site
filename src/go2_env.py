@@ -63,8 +63,9 @@ class Go2Env:
             vis_options=gs.options.VisOptions(
                 rendered_envs_idx=tuple(range(num_envs)), show_world_frame=False
             ),
+            # The rigid solver inherits dt and substeps from SimOptions; setting
+            # its own dt here conflicts with substeps=2 in Genesis >= 1.4.
             rigid_options=gs.options.RigidOptions(
-                dt=self.dt,
                 constraint_solver=gs.constraint_solver.Newton,
                 enable_collision=True,
                 enable_joint_limit=True,
@@ -76,7 +77,7 @@ class Go2Env:
         self.cam_0 = None
 
         # Add surface
-        self.scene.add_entity(gs.morphs.Plane())
+        self._add_ground()
 
         # Add robot
         self.base_init_pos = torch.tensor(self.env_cfg["base_init_pos"], device=self.device) # Base robot position
@@ -97,7 +98,11 @@ class Go2Env:
                 pos=(2.5, 0.5, 3.5),
                 lookat=(0, 0, 0.5),
                 fov=40,
-                GUI=True,
+                # Far enough for overview shots of a whole site (the default is 20 m).
+                far=100.0,
+                # The camera's OpenCV window needs a display, so only open it
+                # alongside the interactive viewer.
+                GUI=show_viewer,
             )
 
         # Build env
@@ -171,6 +176,10 @@ class Go2Env:
         
         self.extras = dict()  # extra information for logging
 
+    # Add the ground the robot walks on (subclasses override this to change the terrain)
+    def _add_ground(self):
+        self.scene.add_entity(gs.morphs.Plane())
+
     # Sample a new command (lin_vel_x, lin_vel_y, ang_vel, height, jump: 0.0)
     def _sample_commands(self, envs_idx):
         self.commands[envs_idx, 0] = uniform_sampling(*self.command_cfg["lin_vel_x_range"], (len(envs_idx),), self.device)
@@ -179,7 +188,13 @@ class Go2Env:
         self.commands[envs_idx, 3] = uniform_sampling(*self.command_cfg["height_range"], (len(envs_idx),), self.device)
         self.commands[envs_idx, 4] = 0.0
 
-        height_diff_scale = 0.5 + abs(self.commands[envs_idx, 3] - self.reward_cfg["base_height_target"])/ (self.command_cfg["height_range"][1] - self.reward_cfg["base_height_target"]) * 0.5
+        # Full velocity range at the nominal height, tapering to half at the
+        # extremes of height_range (crouched or stretched gaits move slower).
+        max_height_diff = max(
+            self.command_cfg["height_range"][1] - self.reward_cfg["base_height_target"],
+            self.reward_cfg["base_height_target"] - self.command_cfg["height_range"][0],
+        )
+        height_diff_scale = 1.0 - abs(self.commands[envs_idx, 3] - self.reward_cfg["base_height_target"]) / max_height_diff * 0.5
         self.commands[envs_idx, 0] *= height_diff_scale
         self.commands[envs_idx, 1] *= height_diff_scale
         self.commands[envs_idx, 2] *= height_diff_scale
@@ -277,7 +292,10 @@ class Go2Env:
 
     def get_observations(self):
         # rsl_rl expects named observation groups in a TensorDict.
-        return TensorDict({"policy": self.obs_buf}, batch_size=[self.num_envs])
+        # Clone so the TensorDict does not alias obs_buf: PPO keeps a reference to
+        # these observations and only copies them into storage after env.step(),
+        # which overwrites obs_buf in place.
+        return TensorDict({"policy": self.obs_buf.clone()}, batch_size=[self.num_envs])
 
     def get_privileged_observations(self):
         return None
