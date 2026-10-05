@@ -1,13 +1,24 @@
-# torch must match the NVIDIA driver's CUDA version. With driver 570 (CUDA 12.8):
-#   pip install torch --index-url https://download.pytorch.org/whl/cu128
-torch
-genesis-world
-pandas
-numpy
-matplotlib>=3.9
-imageio
-wandb
-moviepy
-tensorboard
-pynput
-rsl-rl-lib
+# Python 3.12 on Linux / WSL2 with an NVIDIA GPU.
+#   python3.12 -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements.txt
+# The torch wheel from PyPI bundles its own CUDA 12.8 runtime, so it only needs an
+# NVIDIA driver >= 570; no CUDA toolkit install is required.
+
+# Simulation and RL
+torch==2.8.0
+genesis-world==1.2.3
+rsl-rl-lib==5.5.1
+tensordict==0.14.2
+tensorboard==2.21.0
+
+# Numerics
+numpy==1.26.4
+scipy==1.17.1
+
+# Video and images (imageio-ffmpeg provides the libx264 writer used by go2_eval.py)
+opencv-python==4.11.0.86
+imageio==2.38.0
+imageio-ffmpeg==0.6.0
+
+# Keyboard teleoperation (go2_eval_teleop.py)
+pynput==1.8.2
