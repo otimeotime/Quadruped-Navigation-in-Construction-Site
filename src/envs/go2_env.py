@@ -26,7 +26,8 @@ class Go2Env:
     # device: CPU or GPU
     # add_camera: Environment camera enable
     # enable_default_keybinds: Genesis viewer keyboard shortcuts enable
-    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, device="cuda", add_camera = False, enable_default_keybinds=True):
+    # camera_gui: Show the camera's OpenCV window (defaults to show_viewer)
+    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, device="cuda", add_camera = False, enable_default_keybinds=True, camera_gui=None):
         self.device = torch.device(device)
 
         self.num_envs = num_envs # Parallel env
@@ -100,9 +101,9 @@ class Go2Env:
                 fov=40,
                 # Far enough for overview shots of a whole site (the default is 20 m).
                 far=100.0,
-                # The camera's OpenCV window needs a display, so only open it
-                # alongside the interactive viewer.
-                GUI=show_viewer,
+                # The camera's OpenCV window needs a display, so by default only
+                # open it alongside the interactive viewer.
+                GUI=show_viewer if camera_gui is None else camera_gui,
             )
 
         # Build env

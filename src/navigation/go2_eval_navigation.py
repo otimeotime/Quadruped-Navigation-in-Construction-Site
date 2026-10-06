@@ -6,6 +6,7 @@ import argparse
 import os
 import pickle
 import time
+import imageio
 import numpy as np
 import torch
 import genesis as gs
@@ -25,6 +26,9 @@ GOAL_COLOR = (0.1, 0.85, 0.3, 0.9)
 FALLEN_HEIGHT = 0.15
 FALLEN_STEPS = 50
 
+# Recording camera offset from the robot in follow view (m)
+FOLLOW_CAM_OFFSET = np.array([2.5, 0.5, 3.0])
+
 
 def main():
     parser = argparse.ArgumentParser(description="Click anywhere in the construction site and the Go2 walks there")
@@ -42,6 +46,10 @@ def main():
                         help="Clearance kept between the robot's center and obstacles in meters")
     parser.add_argument("--max_speed", type=float, default=1.0, help="Top forward speed in m/s")
     parser.add_argument("--no_realtime", action="store_true", help="Simulate as fast as possible")
+    parser.add_argument("--record", type=str, default=None, metavar="PATH",
+                        help="Record the run to this MP4 file (e.g. nav.mp4)")
+    parser.add_argument("--record_view", type=str, default="follow", choices=["follow", "overview"],
+                        help="Recording camera: follow the robot, or a fixed view of the whole site")
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -63,6 +71,8 @@ def main():
         command_cfg=command_cfg,
         show_viewer=True,
         device=device,
+        add_camera=args.record is not None,
+        camera_gui=False,  # the viewer is already open, no extra camera window
         site_size=args.site_size,
         num_obstacles=args.num_obstacles,
         obstacle_seed=args.obstacle_seed,
@@ -82,6 +92,14 @@ def main():
     env.scene.viewer.set_camera_pose(pos=np.array([0.9 * s, -0.9 * s, 0.75 * s]), lookat=np.zeros(3))
     print(f"Site {s:g} x {s:g} m with {len(env.obstacles)} obstacles.")
     print("Click on the ground to send the robot there. Drag to orbit, scroll to zoom, close the window to exit.")
+
+    writer = None
+    if args.record is not None:
+        if args.record_view == "overview":
+            env.cam_0.set_pose(pos=(0.9 * s, -0.9 * s, 0.75 * s), lookat=(0.0, 0.0, 0.0))
+        writer = imageio.get_writer(args.record, fps=int(round(1 / env.dt)), codec="libx264", quality=8,
+                                    macro_block_size=1, ffmpeg_log_level="error")
+        print(f"Recording the {args.record_view} view to {args.record}")
 
     # No episode timeout, so every reset is a real fall.
     env.max_episode_length = 10**9
@@ -142,10 +160,21 @@ def main():
                         navigator.set_goal(env.base_pos[0, :2].cpu().numpy(), navigator.goal)
                         draw_route(env.scene, navigator)
 
+                if writer is not None:
+                    if args.record_view == "follow":
+                        base_pos = env.base_pos[0].cpu().numpy()
+                        env.cam_0.set_pose(pos=base_pos + FOLLOW_CAM_OFFSET, lookat=base_pos)
+                    writer.append_data(np.ascontiguousarray(env.cam_0.render(rgb=True)[0]))
+
                 if not args.no_realtime:
                     time.sleep(max(0.0, env.dt - (time.perf_counter() - tick)))
     except KeyboardInterrupt:
         pass
+    finally:
+        # Finalize the video even if the run is interrupted with Ctrl+C.
+        if writer is not None:
+            writer.close()
+            print(f"Saved video to {args.record}")
 
 
 # Point (x, y) raised to the drawing height
