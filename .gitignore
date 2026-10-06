@@ -5,6 +5,9 @@
 /.vscode/
 
 *.mp4
+# Demo videos shown in the README
+!/navigation_demo.mp4
+!/go2_eval_random_0.08.mp4
 *.png
 # Python bytecode
 __pycache__/

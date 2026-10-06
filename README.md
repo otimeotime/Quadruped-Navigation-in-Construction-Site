@@ -9,6 +9,10 @@
 The goal of this project is to make a **quadruped** able to walk freely in a simulated construction site.
 At the moment, the walking policy is trained from scratch. And there will be a navigation script that helps the robot navigates around the site.
 
+**Demos**
+- [Locomotion policy on random rough terrain (bumps up to 0.08 m)](go2_eval_random_0.08.mp4): the evaluation tour of every command type.
+- [Navigation in the construction site](navigation_demo.mp4): click a goal and the robot plans a path around the obstacles and walks there.
+
 
 ## 2. Quick start
 Requirements: Linux or WSL2, Python 3.12, and an NVIDIA GPU with driver >= 570. The simulation scripts also run on the CPU with `-d cpu`, just much slower.
@@ -62,6 +66,7 @@ python src/train/go2_eval_teleop.py -e go2-walking -c 9999
 With `--save-data True`, the camera frames and commands are saved to `images_buffer.pkl` and `commands_buffer.pkl` when you quit, and `python src/train/create_video_with_overlay.py` turns them into `output_video.mp4` with a joystick overlay.
 
 **Navigate the construction site**
+The pretrained policy is located in logs/go2-walking-v2-rough-random.
 ```bash
 # Look at the site without a robot policy (--headless saves PNG views instead)
 python src/navigation/view_construction_site.py
