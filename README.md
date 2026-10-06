@@ -146,4 +146,4 @@ These are limitations of the current project situation, and will be the future d
 ---
 
 ## 6. License
-MIT our our code. Pre-trained policy and Go2 meshes inherit upstream licences.
+MIT for our code. Pre-trained policy and Go2 meshes inherit upstream licences.
