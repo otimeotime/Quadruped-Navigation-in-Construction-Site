@@ -10,8 +10,10 @@ The goal of this project is to make a **quadruped** able to walk freely in a sim
 At the moment, the walking policy is trained from scratch. And there will be a navigation script that helps the robot navigates around the site.
 
 **Demos**
-- [Locomotion policy on random rough terrain (bumps up to 0.08 m)](go2_eval_random_0.08.mp4): the evaluation tour of every command type.
-- [Navigation in the construction site](navigation_demo.mp4): click a goal and the robot plans a path around the obstacles and walks there.
+- Locomotion policy on random rough terrain
+<video src="https://github.com/user-attachments/assets/521b7e1b-61c5-46e4-8fbe-7886c5d541c2" controls></video>
+
+- Navigation in the construction site 
 
 
 ## 2. Quick start
