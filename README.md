@@ -14,7 +14,7 @@ At the moment, the walking policy is trained from scratch. And there will be a n
 <video src="https://github.com/user-attachments/assets/521b7e1b-61c5-46e4-8fbe-7886c5d541c2" controls></video>
 
 - Navigation in the construction site 
-
+<video src="https://github.com/user-attachments/assets/e2ae0c23-99a1-4aaf-a0f8-64e4ba171d4a" controls></video>
 
 ## 2. Quick start
 Requirements: Linux or WSL2, Python 3.12, and an NVIDIA GPU with driver >= 570. The simulation scripts also run on the CPU with `-d cpu`, just much slower.
